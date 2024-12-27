@@ -16,18 +16,27 @@ public class PlayerInput : MonoBehaviour
     public string keyB;
     public string keyC;
     public string keyD;
+
+    public string keyJRight;
+    public string keyJLeft;
+    public string keyJUp;
+    public string keyJDown;
     
     [Header("===== Output signals =====")]
-    public float dirUp;
-    public float dirRight;
+    public float Dup;
+    public float Dright;
     public float Dmag;
     public Vector3 Dvec;
+    public float Jup;
+    public float Jright;
 
     // 1. pressing signal
     public bool run;
     // 2. trigger once signal
     public bool jump;
     private bool lastJump;
+    public bool attack;
+    private bool lastAttack;
     // 3. double trigger
 
     [Header("===== Others =====")]
@@ -45,6 +54,9 @@ public class PlayerInput : MonoBehaviour
     
     void Update()
     {
+        Jup = (Input.GetKey(keyJUp) ? 1.0f : 0f) - (Input.GetKey(keyJDown) ? 1.0f : 0f);
+        Jright = (Input.GetKey(keyJRight) ? 1.0f : 0f) - (Input.GetKey(keyJLeft) ? 1.0f : 0f);
+        
         targetDup = (Input.GetKey(keyUp) ? 1.0f : 0.0f) - (Input.GetKey(keyDown) ? 1.0f : 0.0f);
         targetDright = (Input.GetKey(keyRight) ? 1.0f : 0.0f) - (Input.GetKey(keyLeft) ? 1.0f : 0.0f);
 
@@ -54,10 +66,10 @@ public class PlayerInput : MonoBehaviour
             targetDright = 0;
         }
         
-        dirUp = Mathf.SmoothDamp(dirUp, targetDup, ref velocityDup, 0.1f);
-        dirRight = Mathf.SmoothDamp(dirRight, targetDright, ref velocityDright, 0.1f);
+        Dup = Mathf.SmoothDamp(Dup, targetDup, ref velocityDup, 0.1f);
+        Dright = Mathf.SmoothDamp(Dright, targetDright, ref velocityDright, 0.1f);
 
-        Vector2 tempDAxis = SquareToCircle(new Vector2(dirRight, dirUp));
+        Vector2 tempDAxis = SquareToCircle(new Vector2(Dright, Dup));
         float Dright2 = tempDAxis.x;
         float Dup2 = tempDAxis.y;
         
@@ -75,8 +87,18 @@ public class PlayerInput : MonoBehaviour
         {
             jump = false;
         }
-
         lastJump = newJump;
+        
+        bool newAttack = Input.GetKey(keyC);
+        if (newAttack != lastAttack && newAttack)
+        {
+            attack = true;
+        }
+        else
+        {
+            attack = false;
+        }
+        lastAttack = newAttack;
     }
 
     private Vector2 SquareToCircle(Vector2 input)
